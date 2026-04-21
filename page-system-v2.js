@@ -189,10 +189,26 @@ class PageRenderer {
             this.ctx.fillStyle = land.getColor();
             this.ctx.fillRect(x, y, 32, 32);
 
+            // 그라데이션 효과
+            const gradient = this.ctx.createLinearGradient(x, y, x + 32, y + 32);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.2)');
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(x, y, 32, 32);
+
             // 테두리
-            this.ctx.strokeStyle = land.owner === 'player' ? '#fbbf24' : '#555';
-            this.ctx.lineWidth = land.owner === 'player' ? 2 : 0.5;
+            if (land.owner === 'player') {
+                this.ctx.strokeStyle = '#fbbf24';
+                this.ctx.lineWidth = 2;
+                this.ctx.shadowColor = 'rgba(251, 191, 36, 0.5)';
+                this.ctx.shadowBlur = 8;
+            } else {
+                this.ctx.strokeStyle = '#555';
+                this.ctx.lineWidth = 0.5;
+                this.ctx.shadowColor = 'transparent';
+            }
             this.ctx.strokeRect(x, y, 32, 32);
+            this.ctx.shadowColor = 'transparent';
 
             // 아이콘 및 레벨 표시
             this.ctx.fillStyle = '#fff';
@@ -209,6 +225,7 @@ class PageRenderer {
 
             // 레벨
             this.ctx.font = 'bold 8px Arial';
+            this.ctx.fillStyle = '#fbbf24';
             this.ctx.fillText(`Lv${land.level}`, x + 16, y + 24);
         });
     }
@@ -262,7 +279,7 @@ class PageRenderer {
         const base = gameState.baseManager.getPlayerBase();
         if (!base) return;
 
-        const tileSize = 40;
+        const tileSize = 50;
         const startX = (this.canvas.width - tileSize * 10) / 2;
         const startY = (this.canvas.height - tileSize * 10) / 2;
 
@@ -273,28 +290,46 @@ class PageRenderer {
                 const py = startY + y * tileSize;
 
                 // 배경
-                this.ctx.fillStyle = '#2a2a2a';
+                this.ctx.fillStyle = '#2a3f5f';
                 this.ctx.fillRect(px, py, tileSize, tileSize);
 
                 // 테두리
-                this.ctx.strokeStyle = '#555';
+                this.ctx.strokeStyle = '#0ea5e9';
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeRect(px, py, tileSize, tileSize);
 
                 // 건물 렌더링
                 const building = base.baseInner.getBuildingAt(x, y);
                 if (building) {
-                    this.ctx.fillStyle = building.id === 1 ? '#8b7355' : '#4a90e2';
+                    const colors = {
+                        1: '#8b7355',  // 성벽
+                        2: '#4a90e2'   // 군영
+                    };
+                    this.ctx.fillStyle = colors[building.id] || '#555';
                     this.ctx.fillRect(px + 2, py + 2, tileSize - 4, tileSize - 4);
 
+                    // 그라데이션
+                    const grad = this.ctx.createLinearGradient(px, py, px + tileSize, py + tileSize);
+                    grad.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+                    grad.addColorStop(1, 'rgba(0, 0, 0, 0.2)');
+                    this.ctx.fillStyle = grad;
+                    this.ctx.fillRect(px + 2, py + 2, tileSize - 4, tileSize - 4);
+
+                    // 테두리
+                    this.ctx.strokeStyle = '#fbbf24';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.strokeRect(px + 2, py + 2, tileSize - 4, tileSize - 4);
+
+                    // 아이콘 및 레벨
                     this.ctx.fillStyle = '#fff';
-                    this.ctx.font = 'bold 12px Arial';
+                    this.ctx.font = 'bold 20px Arial';
                     this.ctx.textAlign = 'center';
                     this.ctx.textBaseline = 'middle';
-                    this.ctx.fillText(building.icon, px + tileSize / 2, py + tileSize / 2 - 5);
+                    this.ctx.fillText(building.icon, px + tileSize / 2, py + tileSize / 2 - 8);
 
-                    this.ctx.font = 'bold 8px Arial';
-                    this.ctx.fillText(`Lv${building.level}`, px + tileSize / 2, py + tileSize / 2 + 8);
+                    this.ctx.font = 'bold 10px Arial';
+                    this.ctx.fillStyle = '#fbbf24';
+                    this.ctx.fillText(`Lv${building.level}`, px + tileSize / 2, py + tileSize / 2 + 12);
                 }
             }
         }
@@ -310,7 +345,7 @@ class PageRenderer {
         const land = gameState.landMap.getLand(this.currentLandX, this.currentLandY);
         if (!land) return;
 
-        const tileSize = 40;
+        const tileSize = 50;
         const startX = (this.canvas.width - tileSize * 10) / 2;
         const startY = (this.canvas.height - tileSize * 10) / 2;
 
@@ -324,8 +359,15 @@ class PageRenderer {
                 this.ctx.fillStyle = land.getColor();
                 this.ctx.fillRect(px, py, tileSize, tileSize);
 
+                // 그라데이션
+                const grad = this.ctx.createLinearGradient(px, py, px + tileSize, py + tileSize);
+                grad.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
+                grad.addColorStop(1, 'rgba(0, 0, 0, 0.25)');
+                this.ctx.fillStyle = grad;
+                this.ctx.fillRect(px, py, tileSize, tileSize);
+
                 // 테두리
-                this.ctx.strokeStyle = '#555';
+                this.ctx.strokeStyle = '#0ea5e9';
                 this.ctx.lineWidth = 1;
                 this.ctx.strokeRect(px, py, tileSize, tileSize);
             }
@@ -333,12 +375,16 @@ class PageRenderer {
 
         // 땅 정보 표시
         this.ctx.fillStyle = '#fff';
-        this.ctx.font = 'bold 16px Arial';
+        this.ctx.font = 'bold 24px Arial';
         this.ctx.textAlign = 'left';
-        this.ctx.fillText(`${land.getTypeDisplay()} Lv${land.level}`, 20, 40);
-        this.ctx.font = '12px Arial';
-        this.ctx.fillText(`시간당 생산: ${land.production}`, 20, 60);
-        this.ctx.fillText(`소유: ${land.owner || '중립'}`, 20, 80);
+        this.ctx.fillText(`${land.getTypeDisplay()} Lv${land.level}`, 30, 50);
+        
+        this.ctx.font = '14px Arial';
+        this.ctx.fillStyle = '#0ea5e9';
+        this.ctx.fillText(`시간당 생산: ${land.production}`, 30, 80);
+        
+        this.ctx.fillStyle = land.owner ? '#10b981' : '#ef4444';
+        this.ctx.fillText(`소유: ${land.owner === 'player' ? '내 땅' : '중립'}`, 30, 110);
     }
 
     render(gameState, pageManager) {
