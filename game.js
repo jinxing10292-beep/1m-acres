@@ -557,14 +557,35 @@ class Game {
     constructor() {
         this.gameState = new GameState();
         this.renderer = new MapRenderer(document.getElementById('gameCanvas'));
+        this.saveSystem = new SaveSystem();
         this.isRunning = true;
 
         this.initializeGame();
+        this.setupSaveUI();
         this.gameLoop();
     }
 
     initializeGame() {
-        // 플레이어 거점 생성
+        // 저장된 게임이 있는지 확인
+        if (this.saveSystem.hasSave()) {
+            const confirmed = confirm('저장된 게임이 있습니다. 로드하시겠습니까?');
+            if (confirmed) {
+                const saveData = this.saveSystem.loadGame();
+                if (saveData) {
+                    this.saveSystem.restoreGameState(saveData, this.gameState);
+                    UIManager.updateResourceDisplay(this.gameState);
+                    UIManager.updateTimeDisplay(this.gameState);
+                    UIManager.updateUnitPanel(this.gameState);
+                    UIManager.updateBuildingPanel(this.gameState);
+                    UIManager.updateDungeonPanel(this.gameState);
+                    UIManager.showProductionInfo(this.gameState);
+                    this.saveSystem.startAutoSave(this.gameState);
+                    return;
+                }
+            }
+        }
+
+        // 새 게임 시작
         this.gameState.bases.push({
             x: 10,
             y: 10,
@@ -574,7 +595,6 @@ class Game {
             level: 1
         });
 
-        // 중립 거점 생성
         this.gameState.bases.push({
             x: 50,
             y: 50,
@@ -613,6 +633,16 @@ class Game {
         UIManager.updateBuildingPanel(this.gameState);
         UIManager.updateDungeonPanel(this.gameState);
         UIManager.showProductionInfo(this.gameState);
+
+        // 자동 저장 시작
+        this.saveSystem.startAutoSave(this.gameState);
+    }
+
+    setupSaveUI() {
+        const savePanel = SaveSystemUI.createSavePanel();
+        document.body.appendChild(savePanel);
+        SaveSystemUI.setupEventListeners(this, this.saveSystem);
+        SaveSystemUI.updateSaveInfo(this.saveSystem);
     }
 
     gameLoop() {
