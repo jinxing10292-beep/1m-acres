@@ -90,9 +90,21 @@ class PageRenderer {
         this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
         this.canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
         this.canvas.addEventListener('wheel', (e) => this.onWheel(e));
-        this.canvas.addEventListener('click', (e) => this.onClick(e));
 
         window.addEventListener('resize', () => this.setupCanvas());
+    }
+
+    /**
+     * 클릭 이벤트 처리 (페이지별로 다르게)
+     */
+    handleClick(e, gameState, pageManager) {
+        if (pageManager.isBaseInnerPage()) {
+            this.onBaseInnerClick(e, gameState);
+        } else if (pageManager.isLandInnerPage()) {
+            this.onLandInnerClick(e, gameState);
+        } else if (pageManager.isLandPage()) {
+            this.onClick(e);
+        }
     }
 
     onMouseDown(e) {
@@ -133,6 +145,58 @@ class PageRenderer {
 
         if (tileX >= 0 && tileX < 500 && tileY >= 0 && tileY < 500) {
             console.log(`Clicked: (${tileX}, ${tileY})`);
+        }
+    }
+
+    /**
+     * 거점 내부 클릭 처리
+     */
+    onBaseInnerClick(e, gameState) {
+        const rect = this.canvas.getBoundingClientRect();
+        const base = gameState.baseManager.getPlayerBase();
+        if (!base) return;
+
+        const tileSize = 50;
+        const startX = (this.canvas.width - tileSize * 10) / 2;
+        const startY = (this.canvas.height - tileSize * 10) / 2;
+
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        const gridX = Math.floor((clickX - startX) / tileSize);
+        const gridY = Math.floor((clickY - startY) / tileSize);
+
+        if (gridX >= 0 && gridX < 10 && gridY >= 0 && gridY < 10) {
+            const building = base.baseInner.getBuildingAt(gridX, gridY);
+            if (building) {
+                this.selectedBuilding = building;
+                console.log(`선택된 건물: ${building.name} Lv${building.level}`);
+                // UI 업데이트 필요
+            }
+        }
+    }
+
+    /**
+     * 땅 내부 클릭 처리
+     */
+    onLandInnerClick(e, gameState) {
+        const rect = this.canvas.getBoundingClientRect();
+        const land = gameState.landMap.getLand(this.currentLandX, this.currentLandY);
+        if (!land) return;
+
+        const tileSize = 50;
+        const startX = (this.canvas.width - tileSize * 10) / 2;
+        const startY = (this.canvas.height - tileSize * 10) / 2;
+
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        const gridX = Math.floor((clickX - startX) / tileSize);
+        const gridY = Math.floor((clickY - startY) / tileSize);
+
+        if (gridX >= 0 && gridX < 10 && gridY >= 0 && gridY < 10) {
+            this.selectedLand = land;
+            console.log(`선택된 땅: ${land.getTypeDisplay()} Lv${land.level}`);
         }
     }
 

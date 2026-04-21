@@ -283,8 +283,8 @@ class InnerBuilding {
         Object.assign(this, typeData);
         this.x = x;
         this.y = y;
-        this.level = 1;
-        this.currentHp = this.hp || 0;
+        this.level = 0;  // 초기 레벨 0
+        this.currentHp = 0;
     }
 
     /**
@@ -336,27 +336,37 @@ class BaseInner {
     }
 
     /**
-     * 초기 건물 배치
+     * 초기 건물 배치 (모두 레벨 0)
      */
     initializeBuildings() {
         // 성벽 (테두리)
         for (let i = 0; i < this.size; i++) {
             // 위쪽
-            this.buildings.push(new InnerBuilding(1, i, 0));
+            const wall1 = new InnerBuilding(1, i, 0);
+            wall1.level = 0;
+            this.buildings.push(wall1);
             // 아래쪽
-            this.buildings.push(new InnerBuilding(1, i, this.size - 1));
+            const wall2 = new InnerBuilding(1, i, this.size - 1);
+            wall2.level = 0;
+            this.buildings.push(wall2);
             // 왼쪽
             if (i > 0 && i < this.size - 1) {
-                this.buildings.push(new InnerBuilding(1, 0, i));
+                const wall3 = new InnerBuilding(1, 0, i);
+                wall3.level = 0;
+                this.buildings.push(wall3);
             }
             // 오른쪽
             if (i > 0 && i < this.size - 1) {
-                this.buildings.push(new InnerBuilding(1, this.size - 1, i));
+                const wall4 = new InnerBuilding(1, this.size - 1, i);
+                wall4.level = 0;
+                this.buildings.push(wall4);
             }
         }
 
         // 군영 (중앙)
-        this.buildings.push(new InnerBuilding(2, 5, 5));
+        const barracks = new InnerBuilding(2, 5, 5);
+        barracks.level = 0;
+        this.buildings.push(barracks);
     }
 
     /**

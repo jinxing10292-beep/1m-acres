@@ -15,7 +15,7 @@ class GameState {
     }
 
     initializeGame() {
-        // 플레이어 거점 생성 (처음에는 자동 점령 없음)
+        // 플레이어 거점 생성
         const playerBase = this.baseManager.createBase(250, 250, '본거지', 'player');
         
         // 거점에 초기 병사 2명 배치 (창병)
@@ -28,8 +28,8 @@ class GameState {
         this.resourceSystem.addUnitConsumption(unit1.foodConsumption);
         this.resourceSystem.addUnitConsumption(unit2.foodConsumption);
 
-        // 땅 페이지로 시작
-        this.pageManager.goToLand();
+        // 거점 내부 페이지로 시작
+        this.pageManager.goToBaseInner(playerBase.id);
 
         console.log('✅ 게임 초기화 완료');
         console.log('초기 자원:', this.resourceSystem.getResources());
@@ -374,6 +374,7 @@ class Game {
         this.isRunning = true;
 
         this.setupUI();
+        this.setupClickHandler();
         this.gameLoop();
     }
 
@@ -382,6 +383,12 @@ class Game {
         UIManager.updatePageInfo(this.gameState);
         UIManager.updateBasePanel(this.gameState);
         UIManager.updatePageButtons(this.gameState);
+    }
+
+    setupClickHandler() {
+        this.renderer.canvas.addEventListener('click', (e) => {
+            this.renderer.handleClick(e, this.gameState, this.gameState.pageManager);
+        });
     }
 
     gameLoop() {
