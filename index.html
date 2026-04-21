@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>삼국: 계절의 패자</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- 상단 바: 자원 및 시간 정보 -->
+        <div class="top-bar">
+            <div class="resource-display">
+                <div class="resource-item">
+                    <span class="resource-label">목재</span>
+                    <span class="resource-value" id="wood">0</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-label">석재</span>
+                    <span class="resource-value" id="stone">0</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-label">식량</span>
+                    <span class="resource-value" id="food">0</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-label">금화</span>
+                    <span class="resource-value" id="gold">0</span>
+                </div>
+            </div>
+            <div class="time-display">
+                <span id="season">봄</span>
+                <span id="day">1일차</span>
+            </div>
+        </div>
+
+        <!-- 중앙 맵 뷰 -->
+        <div class="map-container">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <!-- 하단 패널 -->
+        <div class="bottom-panel">
+            <div class="panel-section">
+                <h3>부대 편성</h3>
+                <div id="unitPanel" class="unit-panel"></div>
+            </div>
+            <div class="panel-section">
+                <h3>건물 건설</h3>
+                <div id="buildingPanel" class="building-panel"></div>
+            </div>
+            <div class="panel-section">
+                <h3>던전</h3>
+                <div id="dungeonPanel" class="dungeon-panel"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 로그라이크 선택 팝업 -->
+    <div id="choicePopup" class="choice-popup hidden">
+        <div class="choice-content">
+            <h2>정책 선택</h2>
+            <div class="choice-options" id="choiceOptions"></div>
+        </div>
+    </div>
+
+    <!-- 전투 로그 팝업 -->
+    <div id="battleLogPopup" class="choice-popup hidden">
+        <div class="choice-content" style="max-width: 800px; max-height: 600px; overflow-y: auto;">
+            <h2>전투 로그</h2>
+            <div id="battleLogContent" style="text-align: left; font-size: 12px; color: #aaa;"></div>
+            <button onclick="document.getElementById('battleLogPopup').classList.add('hidden')" style="margin-top: 20px; padding: 10px 20px; background: #fbbf24; color: #000; border: none; border-radius: 4px; cursor: pointer;">닫기</button>
+        </div>
+    </div>
+
+    <script src="units.js"></script>
+    <script src="buildings.js"></script>
+    <script src="combat.js"></script>
+    <script src="roguelike.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
