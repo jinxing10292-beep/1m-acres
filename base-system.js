@@ -12,6 +12,7 @@ class Base {
         this.maxHp = 100;
         this.level = 1;
         this.units = [];  // 거점에 주둔한 병사들
+        this.baseInner = new BaseInner();  // 거점 내부 (10x10)
         this.createdAt = Date.now();
     }
 

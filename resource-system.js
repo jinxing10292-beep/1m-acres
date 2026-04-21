@@ -6,7 +6,8 @@ const RESOURCE_CONFIG = {
     INITIAL_AMOUNT: 700,        // 초기 자원량
     BASE_PRODUCTION_PER_HOUR: 100, // 기본 시간당 생산량
     HOUR_IN_MS: 3600000,        // 1시간 (밀리초)
-    PRODUCTION_TICK: 1000       // 1초마다 계산
+    REWARD_POINTS_PER_DAY: 50,  // 매일 지급 포인트
+    MAX_REWARD_POINTS: 50       // 최대 보상 포인트
 };
 
 class ResourceSystem {
@@ -27,7 +28,9 @@ class ResourceSystem {
             food: 0  // 병사 수에 따라 증가
         };
         
-        this.lastUpdateTime = Date.now();
+        this.rewardPoints = RESOURCE_CONFIG.MAX_REWARD_POINTS;
+        this.lastProductionTime = Date.now();
+        this.lastRewardTime = Date.now();
     }
 
     /**
@@ -49,19 +52,30 @@ class ResourceSystem {
     }
 
     /**
-     * 자원 업데이트 (1시간 = 3600초)
+     * 자원 업데이트 (1시간마다 딱 1번)
      */
     update() {
         const now = Date.now();
-        const elapsedMs = now - this.lastUpdateTime;
-        const elapsedHours = elapsedMs / RESOURCE_CONFIG.HOUR_IN_MS;
+        const elapsedMs = now - this.lastProductionTime;
+        
+        // 1시간 경과 시 자원 생산
+        if (elapsedMs >= RESOURCE_CONFIG.HOUR_IN_MS) {
+            this.resources.food += this.production.food;
+            this.resources.wood += this.production.wood;
+            this.resources.stone += this.production.stone;
+            
+            this.lastProductionTime = now;
+            console.log('✅ 자원 생산:', this.getResources());
+        }
 
-        // 각 자원 생산
-        this.resources.food += this.production.food * elapsedHours;
-        this.resources.wood += this.production.wood * elapsedHours;
-        this.resources.stone += this.production.stone * elapsedHours;
-
-        this.lastUpdateTime = now;
+        // 보상 포인트 업데이트 (1시간마다)
+        if (elapsedMs >= RESOURCE_CONFIG.HOUR_IN_MS) {
+            this.rewardPoints = Math.min(
+                this.rewardPoints + RESOURCE_CONFIG.REWARD_POINTS_PER_DAY,
+                RESOURCE_CONFIG.MAX_REWARD_POINTS
+            );
+            console.log('✅ 보상 포인트:', this.rewardPoints);
+        }
     }
 
     /**
@@ -80,6 +94,17 @@ class ResourceSystem {
      */
     add(resource, amount) {
         this.resources[resource] += amount;
+    }
+
+    /**
+     * 보상 포인트 사용
+     */
+    useRewardPoints(amount) {
+        if (this.rewardPoints >= amount) {
+            this.rewardPoints -= amount;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -114,5 +139,12 @@ class ResourceSystem {
             wood: this.production.wood,
             stone: this.production.stone
         };
+    }
+
+    /**
+     * 보상 포인트 조회
+     */
+    getRewardPoints() {
+        return this.rewardPoints;
     }
 }
